@@ -172,11 +172,55 @@ input[type="number"].small-text {
 }
 
 /* ========================================
-   Stats Dashboard (Future)
+   Admin Dashboard
    ======================================== */
+.pc-admin-dashboard {
+    max-width: 1400px;
+}
+
+.pc-admin-dashboard h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Period Selector */
+.pc-period-selector {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 20px 0;
+    display: flex;
+    gap: 5px;
+}
+
+.pc-period-btn {
+    padding: 8px 16px;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    background: #fff;
+    color: #2c3338;
+    text-decoration: none;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.pc-period-btn:hover {
+    background: #f6f7f7;
+    color: #2271b1;
+}
+
+.pc-period-btn.active {
+    background: #2271b1;
+    color: #fff;
+    border-color: #2271b1;
+}
+
+/* Stats Grid */
 .pc-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 20px;
     margin: 20px 0;
 }
@@ -187,34 +231,104 @@ input[type="number"].small-text {
     border-radius: 4px;
     padding: 20px;
     box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    display: flex;
+    gap: 15px;
 }
 
-.pc-stat-card h3 {
-    margin: 0 0 10px;
+.pc-stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pc-stat-icon .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: #fff;
+}
+
+.pc-stat-revenue .pc-stat-icon { background: #2563eb; }
+.pc-stat-access .pc-stat-icon { background: #10b981; }
+.pc-stat-listings .pc-stat-icon { background: #f59e0b; }
+.pc-stat-aov .pc-stat-icon { background: #8b5cf6; }
+
+.pc-stat-content {
+    flex: 1;
+}
+
+.pc-stat-content h3 {
+    margin: 0 0 8px;
     font-size: 13px;
     font-weight: 600;
     color: #646970;
     text-transform: uppercase;
 }
 
-.pc-stat-card .pc-stat-value {
-    font-size: 32px;
-    font-weight: 600;
+.pc-stat-value {
+    font-size: 28px;
+    font-weight: 700;
     color: #1d2327;
     line-height: 1;
+    margin: 0 0 8px;
 }
 
-.pc-stat-card .pc-stat-change {
-    margin-top: 8px;
-    font-size: 13px;
+.pc-stat-label {
+    margin: 0;
+    font-size: 12px;
+    color: #646970;
 }
 
-.pc-stat-change.positive {
-    color: #00a32a;
+/* Charts Row */
+.pc-charts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
 }
 
-.pc-stat-change.negative {
-    color: #d63638;
+.pc-chart-container {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.pc-chart-container h2 {
+    margin: 0 0 20px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pc-chart-container canvas {
+    max-height: 300px;
+}
+
+/* Tables Row */
+.pc-tables-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.pc-table-container {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.pc-table-container h2 {
+    margin: 0 0 15px;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 /* ========================================
