@@ -1,0 +1,407 @@
+/**
+ * Premium Classifieds - Archive Listing Styles
+ * 
+ * Styles for listing archive page with filters and grid layout
+ *
+ * @package    PremiumClassifieds
+ * @version    2.1.0
+ */
+
+/* ========================================
+   Variables
+   ======================================== */
+:root {
+    --pc-primary: #2563eb;
+    --pc-primary-hover: #1d4ed8;
+    --pc-success: #10b981;
+    --pc-warning: #f59e0b;
+    --pc-white: #ffffff;
+    --pc-gray-50: #f9fafb;
+    --pc-gray-100: #f3f4f6;
+    --pc-gray-200: #e5e7eb;
+    --pc-gray-600: #4b5563;
+    --pc-gray-900: #111827;
+    --pc-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --pc-radius: 0.75rem;
+}
+
+/* ========================================
+   Archive Wrapper
+   ======================================== */
+.pc-archive-wrapper {
+    background: var(--pc-gray-50);
+    padding: 2rem 0;
+    min-height: 70vh;
+}
+
+.pc-archive-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* ========================================
+   Archive Header
+   ======================================== */
+.pc-archive-header {
+    background: var(--pc-white);
+    border-radius: var(--pc-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--pc-shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.pc-header-content {
+    flex: 1;
+}
+
+.pc-archive-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--pc-gray-900);
+}
+
+.pc-archive-title span {
+    color: var(--pc-primary);
+}
+
+.pc-results-count {
+    color: var(--pc-gray-600);
+    font-size: 0.875rem;
+}
+
+/* ========================================
+   Grid Layout
+   ======================================== */
+.pc-archive-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* ========================================
+   Toolbar
+   ======================================== */
+.pc-archive-toolbar {
+    background: var(--pc-white);
+    border-radius: var(--pc-radius);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--pc-shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pc-view-mode {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.pc-view-btn {
+    background: var(--pc-white);
+    border: 1px solid var(--pc-gray-200);
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pc-view-btn:hover {
+    background: var(--pc-gray-50);
+    border-color: var(--pc-primary);
+}
+
+.pc-view-btn.active {
+    background: var(--pc-primary);
+    border-color: var(--pc-primary);
+    color: var(--pc-white);
+}
+
+.pc-view-btn .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.pc-sort-options {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.pc-sort-options label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--pc-gray-600);
+}
+
+/* ========================================
+   Active Filters
+   ======================================== */
+.pc-active-filters {
+    background: var(--pc-white);
+    border-radius: var(--pc-radius);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--pc-shadow);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.pc-filters-label {
+    font-weight: 600;
+    color: var(--pc-gray-900);
+}
+
+.pc-filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--pc-gray-100);
+    color: var(--pc-gray-900);
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.pc-filter-tag:hover {
+    background: var(--pc-gray-200);
+}
+
+.pc-filter-tag .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.pc-clear-filters {
+    color: var(--pc-primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-left: auto;
+}
+
+.pc-clear-filters:hover {
+    text-decoration: underline;
+}
+
+/* ========================================
+   Listings Grid
+   ======================================== */
+.pc-listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.pc-listings-grid[data-view="list"] {
+    grid-template-columns: 1fr;
+}
+
+.pc-listings-grid[data-view="list"] .pc-listing-card {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1.5rem;
+}
+
+/* ========================================
+   Pagination
+   ======================================== */
+.pc-pagination {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+}
+
+.pc-pagination ul {
+    display: flex;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pc-pagination li {
+    margin: 0;
+}
+
+.pc-pagination a,
+.pc-pagination span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: var(--pc-white);
+    border: 1px solid var(--pc-gray-200);
+    border-radius: 0.375rem;
+    color: var(--pc-gray-900);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.pc-pagination a:hover {
+    background: var(--pc-gray-50);
+    border-color: var(--pc-primary);
+    color: var(--pc-primary);
+}
+
+.pc-pagination .current {
+    background: var(--pc-primary);
+    border-color: var(--pc-primary);
+    color: var(--pc-white);
+}
+
+.pc-pagination .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* ========================================
+   Empty State
+   ======================================== */
+.pc-empty-state {
+    background: var(--pc-white);
+    border-radius: var(--pc-radius);
+    padding: 4rem 2rem;
+    text-align: center;
+    box-shadow: var(--pc-shadow);
+}
+
+.pc-empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--pc-gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pc-empty-icon .dashicons {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: var(--pc-gray-600);
+}
+
+.pc-empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    color: var(--pc-gray-900);
+}
+
+.pc-empty-state p {
+    color: var(--pc-gray-600);
+    margin: 0 0 1.5rem;
+}
+
+/* ========================================
+   No Results
+   ======================================== */
+.pc-no-results {
+    background: var(--pc-white);
+    border-radius: var(--pc-radius);
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--pc-gray-600);
+    box-shadow: var(--pc-shadow);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 1200px) {
+    .pc-archive-grid {
+        grid-template-columns: 260px 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .pc-archive-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pc-archive-sidebar {
+        order: 2;
+    }
+    
+    .pc-archive-main {
+        order: 1;
+    }
+    
+    .pc-listings-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .pc-archive-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .pc-archive-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .pc-view-mode {
+        justify-content: center;
+    }
+    
+    .pc-sort-options {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .pc-sort-options label {
+        text-align: left;
+    }
+    
+    .pc-listings-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pc-active-filters {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .pc-clear-filters {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .pc-archive-wrapper {
+        padding: 1rem 0;
+    }
+    
+    .pc-archive-header {
+        padding: 1.5rem;
+    }
+    
+    .pc-archive-title {
+        font-size: 1.5rem;
+    }
+}

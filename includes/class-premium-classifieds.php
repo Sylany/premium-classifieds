@@ -99,36 +99,68 @@ class Premium_Classifieds {
      */
     private function load_dependencies(): void {
         // Core components
-        $this->components['security'] = new PC_Security();
-        $this->components['ajax'] = new PC_Ajax_Handler();
+        if (class_exists('PC_Security')) {
+            $this->components['security'] = new PC_Security();
+        }
+        if (class_exists('PC_Ajax_Handler')) {
+            $this->components['ajax'] = new PC_Ajax_Handler();
+        }
         
         // Database handlers
-        $this->components['db_transactions'] = new PC_DB_Transactions();
-        $this->components['db_messages'] = new PC_DB_Messages();
-        $this->components['db_access'] = new PC_DB_Access_Grants();
+        if (class_exists('PC_DB_Transactions')) {
+            $this->components['db_transactions'] = new PC_DB_Transactions();
+        }
+        if (class_exists('PC_DB_Messages')) {
+            $this->components['db_messages'] = new PC_DB_Messages();
+        }
+        if (class_exists('PC_DB_Access_Grants')) {
+            $this->components['db_access'] = new PC_DB_Access_Grants();
+        }
         
         // Core WordPress integration
-        $this->components['post_types'] = new PC_Post_Types();
-        $this->components['taxonomies'] = new PC_Taxonomies();
-        $this->components['meta_boxes'] = new PC_Meta_Boxes();
+        if (class_exists('PC_Post_Types')) {
+            $this->components['post_types'] = new PC_Post_Types();
+        }
+        if (class_exists('PC_Taxonomies')) {
+            $this->components['taxonomies'] = new PC_Taxonomies();
+        }
+        if (class_exists('PC_Meta_Boxes')) {
+            $this->components['meta_boxes'] = new PC_Meta_Boxes();
+        }
         
         // Frontend components
         if (!is_admin()) {
-            $this->components['dashboard'] = new PC_Dashboard();
-            $this->components['listing_display'] = new PC_Listing_Display();
+            if (class_exists('PC_Search_Filter')) {
+                $this->components['search_filter'] = new PC_Search_Filter();
+            }
+            if (class_exists('PC_Dashboard')) {
+                $this->components['dashboard'] = new PC_Dashboard();
+            }
         }
         
         // Admin components
         if (is_admin()) {
-            $this->components['admin_dashboard'] = new PC_Admin_Dashboard();
-            $this->components['moderation'] = new PC_Moderation();
-            $this->components['settings'] = new PC_Settings();
-            $this->components['data_exporter'] = new PC_Data_Exporter();
+            if (class_exists('PC_Admin_Dashboard')) {
+                $this->components['admin_dashboard'] = new PC_Admin_Dashboard();
+            }
+            if (class_exists('PC_Moderation')) {
+                $this->components['moderation'] = new PC_Moderation();
+            }
+            if (class_exists('PC_Settings')) {
+                $this->components['settings'] = new PC_Settings();
+            }
+            if (class_exists('PC_Data_Exporter')) {
+                $this->components['data_exporter'] = new PC_Data_Exporter();
+            }
         }
         
         // Payment system (always loaded for webhooks)
-        $this->components['stripe_gateway'] = new PC_Stripe_Gateway();
-        $this->components['webhook_handler'] = new PC_Webhook_Handler();
+        if (class_exists('PC_Stripe_Gateway')) {
+            $this->components['stripe_gateway'] = new PC_Stripe_Gateway();
+        }
+        if (class_exists('PC_Webhook_Handler')) {
+            $this->components['webhook_handler'] = new PC_Webhook_Handler();
+        }
     }
     
     /**
@@ -165,14 +197,17 @@ class Premium_Classifieds {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_public_assets']);
         
         // Register shortcodes
-        add_shortcode('premium_dashboard', [$this, 'render_dashboard_shortcode']);
-        add_shortcode('premium_listings', [$this, 'render_listings_shortcode']);
+        if (isset($this->components['dashboard'])) {
+            add_shortcode('premium_dashboard', [$this, 'render_dashboard_shortcode']);
+        }
         
         // Template overrides
         add_filter('template_include', [$this, 'load_custom_templates']);
         
         // Restrict contact info display
-        add_filter('the_content', [$this, 'filter_listing_content'], 20);
+        if (isset($this->components['db_access'])) {
+            add_filter('the_content', [$this, 'filter_listing_content'], 20);
+        }
     }
     
     /**
@@ -241,13 +276,39 @@ class Premium_Classifieds {
             $this->version
         );
         
-        // Public stylesheet
+        // Single listing styles
         wp_enqueue_style(
-            'pc-public-styles',
-            PC_ASSETS_URL . 'css/public.css',
+            'pc-single-listing',
+            PC_ASSETS_URL . 'css/single-listing.css',
             [],
             $this->version
         );
+        
+        // Stripe checkout styles
+        wp_enqueue_style(
+            'pc-stripe-checkout',
+            PC_ASSETS_URL . 'css/stripe-checkout.css',
+            [],
+            $this->version
+        );
+        
+        // Archive page assets
+        if (is_post_type_archive('listing') || is_tax('listing_category')) {
+            wp_enqueue_style(
+                'pc-archive-styles',
+                PC_ASSETS_URL . 'css/archive-listing.css',
+                [],
+                $this->version
+            );
+            
+            wp_enqueue_script(
+                'pc-search-filters',
+                PC_ASSETS_URL . 'js/search-filters.js',
+                ['jquery'],
+                $this->version,
+                true
+            );
+        }
         
         // jQuery (WordPress bundled)
         wp_enqueue_script('jquery');
@@ -260,6 +321,17 @@ class Premium_Classifieds {
             $this->version,
             true
         );
+        
+        // Single listing JavaScript
+        if (is_singular('listing')) {
+            wp_enqueue_script(
+                'pc-single-listing',
+                PC_ASSETS_URL . 'js/single-listing.js',
+                ['jquery'],
+                $this->version,
+                true
+            );
+        }
         
         // Stripe integration
         wp_enqueue_script(
@@ -278,23 +350,23 @@ class Premium_Classifieds {
             true
         );
         
-        // Drag & drop uploader
-        wp_enqueue_script(
-            'pc-drag-drop',
-            PC_ASSETS_URL . 'js/drag-drop-upload.js',
-            ['jquery'],
-            $this->version,
-            true
-        );
-        
         // Localize with current user data and settings
         $user_id = get_current_user_id();
+        
+        // Get Stripe public key based on mode
+        $stripe_mode = get_option('pc_stripe_mode', 'test');
+        $stripe_public_key = $stripe_mode === 'test' 
+            ? get_option('pc_stripe_test_public_key', '') 
+            : get_option('pc_stripe_live_public_key', '');
+        
         wp_localize_script('pc-dashboard-scripts', 'pcData', [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('pc_dashboard_nonce'),
             'userId' => $user_id,
             'isLoggedIn' => is_user_logged_in(),
-            'stripePublicKey' => get_option('pc_stripe_public_key', ''),
+            'loginUrl' => wp_login_url(get_permalink()),
+            'stripePublicKey' => $stripe_public_key,
+            'maxImages' => get_option('pc_max_images_per_listing', 10),
             'prices' => [
                 'contactReveal' => (float) get_option('pc_price_contact_reveal', 5.00),
                 'listingBoost' => (float) get_option('pc_price_listing_boost', 10.00),
@@ -304,6 +376,7 @@ class Premium_Classifieds {
                 'confirmDelete' => __('Delete this listing?', 'premium-classifieds'),
                 'uploading' => __('Uploading...', 'premium-classifieds'),
                 'messageSent' => __('Message sent successfully', 'premium-classifieds'),
+                'error' => __('An error occurred', 'premium-classifieds'),
             ]
         ]);
     }
@@ -332,6 +405,11 @@ class Premium_Classifieds {
      * @return void
      */
     public function register_admin_menu(): void {
+        // Only register menu if admin components are loaded
+        if (!isset($this->components['admin_dashboard']) || !isset($this->components['settings'])) {
+            return;
+        }
+        
         // Main menu
         add_menu_page(
             __('Premium Classifieds', 'premium-classifieds'),
@@ -376,24 +454,12 @@ class Premium_Classifieds {
             return '<p>' . __('Please log in to access your dashboard.', 'premium-classifieds') . '</p>';
         }
         
-        return $this->components['dashboard']->render();
-    }
-    
-    /**
-     * Render listings shortcode
-     *
-     * @since 2.1.0
-     * @param array<string, mixed> $atts Shortcode attributes
-     * @return string HTML output
-     */
-    public function render_listings_shortcode(array $atts): string {
-        $atts = shortcode_atts([
-            'category' => '',
-            'limit' => 12,
-            'featured' => false,
-        ], $atts);
+        // Check if dashboard component is loaded
+        if (!isset($this->components['dashboard'])) {
+            return '<p>' . __('Dashboard component is not initialized.', 'premium-classifieds') . '</p>';
+        }
         
-        return $this->components['listing_display']->render_archive($atts);
+        return $this->components['dashboard']->render();
     }
     
     /**
@@ -404,6 +470,7 @@ class Premium_Classifieds {
      * @return string Modified template path
      */
     public function load_custom_templates(string $template): string {
+        // Single listing template
         if (is_singular('listing')) {
             $custom_template = PC_TEMPLATES_DIR . 'single-listing.php';
             if (file_exists($custom_template)) {
@@ -411,7 +478,8 @@ class Premium_Classifieds {
             }
         }
         
-        if (is_post_type_archive('listing')) {
+        // Archive listing template
+        if (is_post_type_archive('listing') || is_tax('listing_category')) {
             $custom_template = PC_TEMPLATES_DIR . 'archive-listing.php';
             if (file_exists($custom_template)) {
                 return $custom_template;
@@ -429,21 +497,18 @@ class Premium_Classifieds {
      * @return string Filtered content
      */
     public function filter_listing_content(string $content): string {
+        // Only on single listing pages
         if (!is_singular('listing')) {
             return $content;
         }
         
-        $post_id = get_the_ID();
-        $user_id = get_current_user_id();
-        
-        // Check if user has access
-        $has_access = $this->components['db_access']->check_access($user_id, $post_id);
-        
-        if (!$has_access) {
-            // Hide contact info and show paywall
-            $content .= $this->components['listing_display']->render_paywall($post_id);
+        // Check if access component is loaded
+        if (!isset($this->components['db_access'])) {
+            return $content;
         }
         
+        // Paywall is already handled in single-listing.php template
+        // This filter is kept for future extensions if needed
         return $content;
     }
     
@@ -461,7 +526,9 @@ class Premium_Classifieds {
         }
         
         // Delegate to meta boxes component
-        $this->components['meta_boxes']->save($post_id);
+        if (isset($this->components['meta_boxes'])) {
+            $this->components['meta_boxes']->save($post_id, $post);
+        }
     }
     
     /**

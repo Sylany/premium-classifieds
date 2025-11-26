@@ -144,6 +144,32 @@ class PC_Ajax_Handler {
                 'callback' => [PC_Search_Filter::class, 'search'],
                 'auth' => false,
             ],
+			
+// Messaging actions
+'pc_send_message' => [
+    'callback' => [PC_Message_System::class, 'send_message'],
+    'auth' => true,
+],
+'pc_load_messages' => [
+    'callback' => [PC_Message_System::class, 'load_messages'],
+    'auth' => true,
+],
+'pc_mark_message_read' => [
+    'callback' => [PC_Message_System::class, 'mark_read'],
+    'auth' => true,
+],
+'pc_mark_all_read' => [
+    'callback' => [PC_Message_System::class, 'mark_all_read'],
+    'auth' => true,
+],
+'pc_delete_message' => [
+    'callback' => [PC_Message_System::class, 'delete_message'],
+    'auth' => true,
+],
+'pc_get_threads' => [
+    'callback' => [PC_Message_System::class, 'get_threads'],
+    'auth' => true,
+],
         ];
     }
     
