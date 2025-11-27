@@ -628,4 +628,216 @@ class PC_Settings {
                                min="1">
                         <span><?php esc_html_e('days', 'premium-classifieds'); ?></span>
                         <p class="description">
-                            <?php esc_html_e('Listings will automatically expire after
+                            <?php esc_html_e('Listings will automatically expire after this duration.', 'premium-classifieds'); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row">
+                        <label for="pc_max_images_per_listing"><?php esc_html_e('Maximum Images per Listing', 'premium-classifieds'); ?></label>
+                    </th>
+                    <td>
+                        <input type="number" 
+                               name="pc_max_images_per_listing" 
+                               id="pc_max_images_per_listing" 
+                               value="<?php echo esc_attr($max_images); ?>" 
+                               class="small-text" 
+                               min="1" 
+                               max="50">
+                        <p class="description">
+                            <?php esc_html_e('Maximum number of images allowed per listing.', 'premium-classifieds'); ?>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Render notification settings
+     *
+     * @since 2.1.0
+     * @return void
+     */
+    private function render_notification_settings(): void {
+        $notify_new_listing = get_option('pc_notify_new_listing', '1');
+        $notify_new_message = get_option('pc_notify_new_message', '1');
+        $notify_payment_received = get_option('pc_notify_payment_received', '1');
+        $admin_email = get_option('pc_admin_email', get_option('admin_email'));
+        ?>
+        
+        <div class="pc-settings-section">
+            <h2><?php esc_html_e('Email Notifications', 'premium-classifieds'); ?></h2>
+            <p class="description">
+                <?php esc_html_e('Configure email notifications for various events in the system.', 'premium-classifieds'); ?>
+            </p>
+            
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><?php esc_html_e('New Listing Notifications', 'premium-classifieds'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" 
+                                   name="pc_notify_new_listing" 
+                                   value="1" 
+                                   <?php checked($notify_new_listing, '1'); ?>>
+                            <?php esc_html_e('Send email when new listing is submitted', 'premium-classifieds'); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e('Admin will receive notification for new listings requiring approval.', 'premium-classifieds'); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php esc_html_e('New Message Notifications', 'premium-classifieds'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" 
+                                   name="pc_notify_new_message" 
+                                   value="1" 
+                                   <?php checked($notify_new_message, '1'); ?>>
+                            <?php esc_html_e('Send email when user receives new message', 'premium-classifieds'); ?>
+                        </label>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php esc_html_e('Payment Notifications', 'premium-classifieds'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" 
+                                   name="pc_notify_payment_received" 
+                                   value="1" 
+                                   <?php checked($notify_payment_received, '1'); ?>>
+                            <?php esc_html_e('Send email when payment is received', 'premium-classifieds'); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e('Both admin and user will receive payment confirmation emails.', 'premium-classifieds'); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row">
+                        <label for="pc_admin_email"><?php esc_html_e('Admin Email Address', 'premium-classifieds'); ?></label>
+                    </th>
+                    <td>
+                        <input type="email" 
+                               name="pc_admin_email" 
+                               id="pc_admin_email" 
+                               value="<?php echo esc_attr($admin_email); ?>" 
+                               class="regular-text">
+                        <p class="description">
+                            <?php esc_html_e('Email address to receive admin notifications. Defaults to WordPress admin email.', 'premium-classifieds'); ?>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Render general settings
+     *
+     * @since 2.1.0
+     * @return void
+     */
+    private function render_general_settings(): void {
+        $listings_per_page = get_option('pc_listings_per_page', '12');
+        $enable_recaptcha = get_option('pc_enable_recaptcha', '0');
+        $recaptcha_site_key = get_option('pc_recaptcha_site_key', '');
+        $recaptcha_secret_key = get_option('pc_recaptcha_secret_key', '');
+        ?>
+        
+        <div class="pc-settings-section">
+            <h2><?php esc_html_e('General Settings', 'premium-classifieds'); ?></h2>
+            
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="pc_listings_per_page"><?php esc_html_e('Listings Per Page', 'premium-classifieds'); ?></label>
+                    </th>
+                    <td>
+                        <input type="number" 
+                               name="pc_listings_per_page" 
+                               id="pc_listings_per_page" 
+                               value="<?php echo esc_attr($listings_per_page); ?>" 
+                               class="small-text" 
+                               min="1" 
+                               max="100">
+                        <p class="description">
+                            <?php esc_html_e('Number of listings to show per page in archive and search results.', 'premium-classifieds'); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row"><?php esc_html_e('reCAPTCHA Protection', 'premium-classifieds'); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" 
+                                   name="pc_enable_recaptcha" 
+                                   value="1" 
+                                   <?php checked($enable_recaptcha, '1'); ?>>
+                            <?php esc_html_e('Enable Google reCAPTCHA on forms', 'premium-classifieds'); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e('Adds spam protection to listing submission and contact forms.', 'premium-classifieds'); ?>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row">
+                        <label for="pc_recaptcha_site_key"><?php esc_html_e('reCAPTCHA Site Key', 'premium-classifieds'); ?></label>
+                    </th>
+                    <td>
+                        <input type="text" 
+                               name="pc_recaptcha_site_key" 
+                               id="pc_recaptcha_site_key" 
+                               value="<?php echo esc_attr($recaptcha_site_key); ?>" 
+                               class="regular-text code">
+                        <p class="description">
+                            <?php esc_html_e('Get your keys from', 'premium-classifieds'); ?>
+                            <a href="https://www.google.com/recaptcha/admin" target="_blank">Google reCAPTCHA</a>
+                        </p>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <th scope="row">
+                        <label for="pc_recaptcha_secret_key"><?php esc_html_e('reCAPTCHA Secret Key', 'premium-classifieds'); ?></label>
+                    </th>
+                    <td>
+                        <input type="password" 
+                               name="pc_recaptcha_secret_key" 
+                               id="pc_recaptcha_secret_key" 
+                               value="<?php echo esc_attr($recaptcha_secret_key); ?>" 
+                               class="regular-text code">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Show save notice
+     *
+     * @since 2.1.0
+     * @return void
+     */
+    public function show_save_notice(): void {
+        if (isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true') {
+            ?>
+            <div class="notice notice-success is-dismissible">
+                <p><?php esc_html_e('Settings saved successfully!', 'premium-classifieds'); ?></p>
+            </div>
+            <?php
+        }
+    }
+}
