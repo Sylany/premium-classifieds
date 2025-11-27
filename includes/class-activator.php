@@ -51,6 +51,9 @@ class PC_Activator {
         // Create custom user role
         self::create_custom_roles();
         
+        // Schedule cron jobs
+        self::schedule_cron_jobs();
+        
         // Register post types and taxonomies (needed for flush_rewrite_rules)
         self::register_post_types_temp();
         
@@ -201,6 +204,8 @@ class PC_Activator {
             'pc_notify_new_listing' => '1',
             'pc_notify_new_message' => '1',
             'pc_notify_payment_received' => '1',
+            'pc_notify_boost_activated' => '1',
+            'pc_notify_refunds' => '1',
             'pc_admin_email' => get_option('admin_email'),
             
             // Display Settings
@@ -265,6 +270,29 @@ class PC_Activator {
             $admin_role->add_cap('delete_published_listings');
             $admin_role->add_cap('publish_listings');
             $admin_role->add_cap('moderate_listings');
+        }
+    }
+    
+    /**
+     * Schedule cron jobs for plugin
+     *
+     * @since 2.1.0
+     * @return void
+     */
+    private static function schedule_cron_jobs(): void {
+        // Schedule expired boosts check
+        if (!wp_next_scheduled('pc_check_expired_boosts')) {
+            wp_schedule_event(time(), 'daily', 'pc_check_expired_boosts');
+        }
+        
+        // Schedule expired listings check
+        if (!wp_next_scheduled('pc_check_expired_listings')) {
+            wp_schedule_event(time(), 'daily', 'pc_check_expired_listings');
+        }
+        
+        // Schedule expired access grants check
+        if (!wp_next_scheduled('pc_check_expired_access')) {
+            wp_schedule_event(time(), 'daily', 'pc_check_expired_access');
         }
     }
     

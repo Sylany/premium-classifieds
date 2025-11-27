@@ -217,6 +217,9 @@ class PC_Payment_Intent {
                     $instance->access_db->grant_access($user_id, $listing_id, [
                         'transaction_id' => $transaction_id,
                     ]);
+                    
+                    // Send notification email
+                    $instance->send_purchase_notification($listing_id, $user_id);
                 }
                 
                 PC_Ajax_Handler::send_success([
@@ -350,12 +353,18 @@ class PC_Payment_Intent {
             $this->access_db->grant_access($user_id, $listing_id, [
                 'transaction_id' => $transaction_id,
             ]);
+            
+            // Send purchase notification email
+            $this->send_purchase_notification($listing_id, $user_id);
         }
         
         // Make listing featured if boost
         if ($payment_type === 'listing_boost' && $listing_id > 0) {
             update_post_meta($listing_id, '_pc_featured', 1);
             update_post_meta($listing_id, '_pc_featured_until', date('Y-m-d H:i:s', strtotime('+30 days')));
+            
+            // Send boost notification email
+            $this->send_boost_notification($listing_id, $user_id);
         }
         
         return true;
@@ -402,11 +411,17 @@ class PC_Payment_Intent {
         // Revoke access if contact reveal
         if ($transaction->type === 'contact_reveal' && $transaction->listing_id) {
             $this->access_db->revoke_user_access($transaction->user_id, $transaction->listing_id);
+            
+            // Send refund notification
+            $this->send_refund_notification($transaction->user_id, $transaction->listing_id, 'contact_reveal');
         }
         
         // Remove featured status if boost
         if ($transaction->type === 'listing_boost' && $transaction->listing_id) {
             update_post_meta($transaction->listing_id, '_pc_featured', 0);
+            
+            // Send refund notification
+            $this->send_refund_notification($transaction->user_id, $transaction->listing_id, 'listing_boost');
         }
         
         return true;
@@ -436,5 +451,124 @@ class PC_Payment_Intent {
                 'description' => __('Unlimited contact reveals for 30 days', 'premium-classifieds'),
             ],
         ];
+    }
+    
+    /**
+     * Send purchase notification to listing owner
+     *
+     * @since 2.1.0
+     * @param int $listing_id Listing ID
+     * @param int $buyer_id Buyer user ID
+     * @return void
+     */
+    private function send_purchase_notification(int $listing_id, int $buyer_id): void {
+        if (get_option('pc_notify_payment_received', '1') !== '1') {
+            return;
+        }
+        
+        $listing = get_post($listing_id);
+        $seller = get_userdata($listing->post_author);
+        $buyer = get_userdata($buyer_id);
+        
+        if (!$seller || !$buyer) {
+            return;
+        }
+        
+        $subject = sprintf('[%s] Someone purchased access to your listing', get_bloginfo('name'));
+        
+        $message = sprintf(
+            "Hello %s,\n\n" .
+            "Good news! %s purchased access to your listing \"%s\".\n\n" .
+            "They can now see your contact information and may contact you soon.\n\n" .
+            "View your listing: %s\n\n" .
+            "Thank you,\n" .
+            "%s Team",
+            $seller->display_name,
+            $buyer->display_name,
+            $listing->post_title,
+            get_permalink($listing_id),
+            get_bloginfo('name')
+        );
+        
+        wp_mail($seller->user_email, $subject, $message);
+    }
+    
+    /**
+     * Send boost activation notification
+     *
+     * @since 2.1.0
+     * @param int $listing_id Listing ID
+     * @param int $user_id User ID
+     * @return void
+     */
+    private function send_boost_notification(int $listing_id, int $user_id): void {
+        if (get_option('pc_notify_boost_activated', '1') !== '1') {
+            return;
+        }
+        
+        $listing = get_post($listing_id);
+        $user = get_userdata($user_id);
+        
+        if (!$user) {
+            return;
+        }
+        
+        $subject = sprintf('[%s] Your listing has been featured', get_bloginfo('name'));
+        
+        $message = sprintf(
+            "Hello %s,\n\n" .
+            "Your listing \"%s\" has been successfully featured!\n\n" .
+            "It will appear at the top of search results and be highlighted for 30 days.\n\n" .
+            "View your featured listing: %s\n\n" .
+            "Thank you for using our boost service!\n\n" .
+            "%s Team",
+            $user->display_name,
+            $listing->post_title,
+            get_permalink($listing_id),
+            get_bloginfo('name')
+        );
+        
+        wp_mail($user->user_email, $subject, $message);
+    }
+    
+    /**
+     * Send refund notification
+     *
+     * @since 2.1.0
+     * @param int $user_id User ID
+     * @param int $listing_id Listing ID
+     * @param string $type Payment type
+     * @return void
+     */
+    private function send_refund_notification(int $user_id, int $listing_id, string $type): void {
+        if (get_option('pc_notify_refunds', '1') !== '1') {
+            return;
+        }
+        
+        $user = get_userdata($user_id);
+        $listing = get_post($listing_id);
+        
+        if (!$user || !$listing) {
+            return;
+        }
+        
+        $service_name = $type === 'contact_reveal' ? 'contact access' : 'listing boost';
+        
+        $subject = sprintf('[%s] Refund processed for your %s', get_bloginfo('name'), $service_name);
+        
+        $message = sprintf(
+            "Hello %s,\n\n" .
+            "A refund has been processed for your %s purchase for listing \"%s\".\n\n" .
+            "The amount has been refunded to your original payment method.\n\n" .
+            "If you have any questions, please contact our support team.\n\n" .
+            "Thank you,\n" .
+            "%s Team",
+            $user->display_name,
+            $service_name,
+            $listing->post_title,
+            get_bloginfo('name')
+        );
+        
+        wp_mail($user->user_email, $subject, $message);
     }
 }

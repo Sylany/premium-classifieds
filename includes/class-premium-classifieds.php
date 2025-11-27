@@ -60,6 +60,7 @@ class Premium_Classifieds {
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_public_hooks();
+        $this->define_cron_hooks();
     }
     
     /**
@@ -208,6 +209,23 @@ class Premium_Classifieds {
         if (isset($this->components['db_access'])) {
             add_filter('the_content', [$this, 'filter_listing_content'], 20);
         }
+    }
+    
+    /**
+     * Register cron job hooks
+     *
+     * @since 2.1.0
+     * @return void
+     */
+    private function define_cron_hooks(): void {
+        // Expired boosts check
+        add_action('pc_check_expired_boosts', [$this, 'expire_old_boosts']);
+        
+        // Expired listings check
+        add_action('pc_check_expired_listings', [$this, 'expire_old_listings']);
+        
+        // Expired access grants check
+        add_action('pc_check_expired_access', [$this, 'expire_old_access']);
     }
     
     /**
@@ -529,6 +547,96 @@ class Premium_Classifieds {
         if (isset($this->components['meta_boxes'])) {
             $this->components['meta_boxes']->save($post_id, $post);
         }
+    }
+    
+    /**
+     * Expire old listing boosts
+     *
+     * @since 2.1.0
+     * @return void
+     */
+    public function expire_old_boosts(): void {
+        global $wpdb;
+        
+        // Find featured listings with expired boost
+        $expired_listings = $wpdb->get_results(
+            "SELECT post_id 
+             FROM {$wpdb->postmeta} 
+             WHERE meta_key = '_pc_featured_until' 
+             AND meta_value < NOW()"
+        );
+        
+        foreach ($expired_listings as $listing) {
+            update_post_meta($listing->post_id, '_pc_featured', 0);
+            
+            // Log expiration for debugging
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("Listing boost expired for post ID: {$listing->post_id}");
+            }
+        }
+        
+        // Alternative approach using direct query (more efficient for large datasets)
+        $wpdb->query(
+            "UPDATE {$wpdb->postmeta} 
+             SET meta_value = '0' 
+             WHERE meta_key = '_pc_featured' 
+             AND meta_value = '1'
+             AND post_id IN (
+                 SELECT post_id 
+                 FROM {$wpdb->postmeta} 
+                 WHERE meta_key = '_pc_featured_until' 
+                 AND meta_value < NOW()
+             )"
+        );
+    }
+    
+    /**
+     * Expire old listings
+     *
+     * @since 2.1.0
+     * @return void
+     */
+    public function expire_old_listings(): void {
+        $duration_days = (int) get_option('pc_listing_duration_days', 30);
+        $expiry_date = date('Y-m-d H:i:s', strtotime("-$duration_days days"));
+        
+        $expired_listings = get_posts([
+            'post_type' => 'listing',
+            'post_status' => 'publish',
+            'date_query' => [
+                [
+                    'before' => $expiry_date,
+                ]
+            ],
+            'fields' => 'ids',
+            'posts_per_page' => -1,
+        ]);
+        
+        foreach ($expired_listings as $listing_id) {
+            wp_update_post([
+                'ID' => $listing_id,
+                'post_status' => 'expired'
+            ]);
+        }
+    }
+    
+    /**
+     * Expire old access grants
+     *
+     * @since 2.1.0
+     * @return void
+     */
+    public function expire_old_access(): void {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'pc_contact_access';
+        
+        // Delete expired access grants
+        $wpdb->query(
+            "DELETE FROM {$table_name} 
+             WHERE expires_at IS NOT NULL 
+             AND expires_at < NOW()"
+        );
     }
     
     /**
