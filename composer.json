@@ -1,0 +1,14 @@
+{
+    "name": "yourname/premium-classifieds",
+    "description": "Premium Classifieds (Pay-to-Contact) WordPress plugin",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=7.4",
+        "stripe/stripe-php": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Premium\\Classifieds\\": "includes/"
+        }
+    }
+}

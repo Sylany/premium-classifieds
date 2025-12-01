@@ -1,0 +1,136 @@
+/* File: assets/css/pc-dashboard.css
+   Minimal, modern and responsive styles for the dashboard and admin pages.
+   Prefix: .pc-dashboard / .pc-admin-wrap
+*/
+
+.pc-dashboard,
+.pc-admin-wrap {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color: #222;
+    box-sizing: border-box;
+}
+
+/* Dashboard layout */
+.pc-dashboard {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.pc-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.pc-dashboard-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.pc-tab-btn {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.pc-tab-btn.active {
+    background: #111827;
+    color: #fff;
+}
+
+.pc-tabs-content {
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+/* Listing card */
+.pc-listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+    gap: 12px;
+}
+
+.pc-listing-card {
+    border: 1px solid #e6e6e6;
+    padding: 12px;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.pc-listing-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.05rem;
+}
+
+/* Forms */
+.pc-form .pc-field {
+    margin-bottom: 12px;
+}
+
+.pc-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+}
+
+.pc-form input[type="text"],
+.pc-form input[type="email"],
+.pc-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+}
+
+/* Buttons */
+.pc-btn {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: #f3f4f6;
+}
+
+.pc-btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+
+/* Dropzone */
+.pc-dropzone {
+    border: 2px dashed #d1d5db;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.pc-dropzone-over {
+    border-color: #2563eb;
+    background: #f8fafc;
+}
+
+.pc-gallery-previews {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pc-thumb {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* Admin */
+.pc-admin-wrap .form-table th { width: 220px; }
